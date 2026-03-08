@@ -1,0 +1,27 @@
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local, .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/globals.css:1790:8
+Parsing CSS source code failed
+[0m [90m 1788 |[39m }
+ [90m 1789 |[39m
+[31m[1m>[22m[39m[90m 1790 |[39m [33m@[39m[36mimport[39m url([32m'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'[39m)[33m;[39m
+ [90m      |[39m        [31m[1m^[22m[39m
+ [90m 1791 |[39m
+ [90m 1792 |[39m [33m.[39mfile[37m[41m[1m\[22m[49m[39m[33m:[39mborder[33m-[39m[35m0[39m[33m:[39m[33m:[39mfile[33m-[39mselector[33m-[39mbutton {
+ [90m 1793 |[39m   border[33m-[39mwidth[33m:[39m [35m0[39mpx[33m;[39m[0m
+
+@import rules must precede all rules aside from @charset and @layer statements
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+
+
+    at <unknown> (./src/app/globals.css:1790:8)

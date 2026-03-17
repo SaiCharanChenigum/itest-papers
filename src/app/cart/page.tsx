@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-export default function CartAndOrdersPage() {
+function CartContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: session, status } = useSession();
@@ -322,5 +322,17 @@ export default function CartAndOrdersPage() {
 
             </div>
         </section>
+    );
+}
+
+export default function CartAndOrdersPage() {
+    return (
+        <Suspense fallback={
+            <div className="section-padding min-h-screen flex items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+        }>
+            <CartContent />
+        </Suspense>
     );
 }

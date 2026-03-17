@@ -19,6 +19,7 @@ export default function CartAndOrdersPage() {
     const [activeTab, setActiveTab] = useState<"CART" | "ORDERS">("CART");
     const [orders, setOrders] = useState<any[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
+    const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
 
     useEffect(() => {
         if (searchParams.get("tab") === "orders") {
@@ -57,6 +58,36 @@ export default function CartAndOrdersPage() {
 
     const handleCheckout = () => {
         router.push("/checkout");
+    };
+
+    const handleCancelOrder = async (orderId: string) => {
+        if (!window.confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
+            return;
+        }
+
+        setCancellingOrderId(orderId);
+        try {
+            const res = await fetch("/api/orders/cancel", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success(data.message);
+                // Refresh orders
+                const ordersRes = await fetch("/api/orders");
+                const ordersData = await ordersRes.json();
+                if (ordersData.success) setOrders(ordersData.orders);
+            } else {
+                toast.error(data.error || "Failed to cancel order");
+            }
+        } catch (err) {
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setCancellingOrderId(null);
+        }
     };
 
     const StatusBadge = ({ status }: { status: string }) => {
@@ -249,6 +280,34 @@ export default function CartAndOrdersPage() {
                                                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">Delivery Address</p>
                                                     <p className="text-sm">{order.fullName}</p>
                                                     <p className="text-sm text-muted-foreground">{order.address}, {order.city}, {order.state} - {order.pincode}</p>
+                                                </div>
+
+                                                {/* Cancel Order Section */}
+                                                <div className="flex flex-col sm:items-end justify-end">
+                                                    {(() => {
+                                                        const orderTime = new Date(order.createdAt);
+                                                        const diffMinutes = (new Date().getTime() - orderTime.getTime()) / (1000 * 60);
+                                                        const isEligible = diffMinutes <= 30 && (order.status === "PROCESSING" || order.status === "PENDING");
+
+                                                        if (!isEligible) return null;
+
+                                                        return (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="text-destructive hover:bg-destructive hover:text-white border-destructive/50"
+                                                                onClick={() => handleCancelOrder(order.id)}
+                                                                disabled={cancellingOrderId === order.id}
+                                                            >
+                                                                {cancellingOrderId === order.id ? (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                                        Cancelling...
+                                                                    </div>
+                                                                ) : "Cancel Order"}
+                                                            </Button>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                         </div>

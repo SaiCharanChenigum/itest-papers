@@ -27,7 +27,6 @@ const Footer = () => (
                     <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider text-primary-foreground/50">Quick Links</h4>
                     <ul className="space-y-2 text-sm text-primary-foreground/70">
                         <li><Link href="/pricing" className="hover:text-primary-foreground transition-colors">Pricing</Link></li>
-                        <li><Link href="/blog" className="hover:text-primary-foreground transition-colors">Blog</Link></li>
                         <li><Link href="/login" className="hover:text-primary-foreground transition-colors">Login</Link></li>
                         <li><Link href="/register" className="hover:text-primary-foreground transition-colors">Register</Link></li>
                     </ul>
@@ -38,8 +37,7 @@ const Footer = () => (
                     <ul className="space-y-2 text-sm text-primary-foreground/70">
                         <li><Link href="/about" className="hover:text-primary-foreground transition-colors">About Us</Link></li>
                         <li><Link href="/contact" className="hover:text-primary-foreground transition-colors">Contact</Link></li>
-                        <li><Link href="/privacy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link></li>
-                        <li><Link href="/terms" className="hover:text-primary-foreground transition-colors">Terms & Conditions</Link></li>
+                        <li><Link href="/privacy-policy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link></li>
                     </ul>
                 </div>
             </div>

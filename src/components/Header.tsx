@@ -65,9 +65,6 @@ const Header = () => {
           <Link href="/pricing" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent">
             Pricing
           </Link>
-          <Link href="/blog" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent">
-            Blog
-          </Link>
           <Link
             href="/cart"
             className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent flex items-center gap-1"
@@ -130,7 +127,6 @@ const Header = () => {
             )}
 
             <Link href="/pricing" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">Pricing</Link>
-            <Link href="/blog" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">Blog</Link>
             <Link
               href="/cart"
               onClick={() => setMobileOpen(false)}

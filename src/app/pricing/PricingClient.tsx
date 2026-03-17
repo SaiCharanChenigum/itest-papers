@@ -93,7 +93,7 @@ export default function PricingClient({ userSubscriptions }: PricingClientProps)
             if (!data.success) throw new Error(data.error);
 
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_YourTestKey",
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: data.data.amount,
                 currency: data.data.currency,
                 name: "iTestPapers",

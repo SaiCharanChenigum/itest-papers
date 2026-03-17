@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
         }
 
         const payload = {
-            service_id: process.env.EMAILJS_SERVICE_ID || "service_euq9gsm",
-            template_id: process.env.EMAILJS_ORDER_TEMPLATE_ID || "template_ayqmmaj", // Using generic for now
-            user_id: process.env.EMAILJS_PUBLIC_KEY || "ejWUMJJ_b0PSuayNW",
+            service_id: process.env.EMAILJS_SERVICE_ID!,
+            template_id: process.env.EMAILJS_ORDER_TEMPLATE_ID!,
+            user_id: process.env.EMAILJS_PUBLIC_KEY!,
             template_params: {
                 to_email: "saic9524@gmail.com",
                 order_number: orderDetails.orderNumber,

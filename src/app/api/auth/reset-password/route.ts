@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
+import { randomUUID } from "crypto" // Standard library crypto is better than bcrypt for this check if both imported, but wait I'll keep the imports as they were
+
 import bcrypt from "bcryptjs"
+
+export const dynamic = "force-dynamic"
 
 /**
  * POST /api/auth/reset-password

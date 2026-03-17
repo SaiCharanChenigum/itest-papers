@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { randomUUID } from "crypto"
 
+export const dynamic = "force-dynamic"
+
 /**
  * POST /api/auth/forgot-password
  * Validates email, generates a reset token, stores it in DB.

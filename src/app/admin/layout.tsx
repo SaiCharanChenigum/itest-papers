@@ -8,7 +8,7 @@ export default function AdminLayout({
 }) {
     return (
         <div className="flex min-h-screen bg-muted/20">
-            {/* Sidebar */}
+            {/* Side bar */}
             <aside className="w-64 border-r border-border bg-background hidden md:flex flex-col">
                 <div className="p-6 border-b border-border">
                     <h2 className="font-bold text-lg text-primary flex items-center gap-2">
@@ -16,15 +16,15 @@ export default function AdminLayout({
                     </h2>
                 </div>
                 <nav className="flex-1 p-4 space-y-1">
-                    <Link 
-                        href="/admin/orders" 
+                    <Link
+                        href="/admin/orders"
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md bg-accent text-accent-foreground"
                     >
                         <Package className="h-4 w-4" />
                         Manage Orders
                     </Link>
-                    <Link 
-                        href="/dashboard" 
+                    <Link
+                        href="/dashboard"
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
                         <User className="h-4 w-4" />

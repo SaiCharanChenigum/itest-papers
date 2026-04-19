@@ -79,7 +79,7 @@ const Header = () => {
               <NavButton variant="ghost" href="/dashboard">
                 Dashboard
               </NavButton>
-              <Button variant="outline" onClick={() => signOut({ callbackUrl: '/' })}>
+              <Button variant="outline" onClick={() => signOut({ callbackUrl: '/logout-success' })}>
                 Logout
               </Button>
             </>
@@ -139,7 +139,7 @@ const Header = () => {
               {session ? (
                 <>
                   <NavButton variant="outline" className="w-full" href="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavButton>
-                  <Button variant="outline" className="w-full" onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false); }}>Logout</Button>
+                  <Button variant="outline" className="w-full" onClick={() => { signOut({ callbackUrl: '/logout-success' }); setMobileOpen(false); }}>Logout</Button>
                 </>
               ) : (
                 <>

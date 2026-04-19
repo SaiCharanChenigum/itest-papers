@@ -100,16 +100,26 @@ export default async function DashboardPage() {
                                 <h2 className="mt-3 font-bold text-slate-900">{user.name}</h2>
                                 <p className="text-sm text-slate-500">{user.email}</p>
 
-                                <div className="mt-4">
+                                <div className="mt-4 flex flex-col gap-2">
                                     {hasActiveSubscription ? (
-                                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200">
+                                        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200">
                                             <Crown className="w-3 h-3 mr-1" />
                                             Premium Member
                                         </div>
                                     ) : (
-                                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                                        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
                                             Free Plan
                                         </div>
+                                    )}
+
+                                    {user.role === "ADMIN" && (
+                                        <Link 
+                                            href="/admin/orders" 
+                                            className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-sm"
+                                        >
+                                            <Settings className="w-3 h-3 mr-1.5" />
+                                            Admin Dashboard
+                                        </Link>
                                     )}
                                 </div>
                             </div>

@@ -255,7 +255,7 @@ function CartContent() {
                                             </div>
                                             <div className="flex flex-col sm:items-end gap-1">
                                                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Order # {order.orderNumber}</p>
-                                                <p className="text-xs text-muted-foreground">Paid via {order.paymentMethod}</p>
+                                                <p className="text-xs text-muted-foreground">via {order.paymentMethod}</p>
                                             </div>
                                         </div>
                                         <div className="p-4 sm:p-6">

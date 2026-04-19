@@ -20,14 +20,63 @@ export default async function DashboardPage() {
     const subscriptions = await getUserSubscriptions(user.id)
     const hasActiveSubscription = subscriptions.length > 0 && subscriptions.some(s => s.isActive)
 
-    // Fetch valid subjects
-    const accessibleSubjects = await prisma.subject.findMany({
-        where: { isActive: true },
-        orderBy: [
-            { class: "asc" },
-            { name: "asc" }
-        ]
+    // Fetch user progress
+    const userProgress = await prisma.userProgress.findMany({
+        where: { userId: user.id },
+        select: {
+            contentId: true,
+            completed: true,
+            lastAccessed: true
+        }
     })
+
+    // Fetch accessible subjects with their chapters and content details to calculate progress
+    const allSubjects = await prisma.subject.findMany({
+        where: { isActive: true },
+        include: {
+            chapters: {
+                include: {
+                    contents: {
+                        select: { id: true }
+                    }
+                }
+            }
+        }
+    })
+
+    // Calculate progress for each subject
+    const subjectsWithProgress = allSubjects.map(subject => {
+        const allContentIds = subject.chapters.flatMap(c => c.contents.map(cnt => cnt.id))
+        const totalContent = allContentIds.length
+        
+        // Items are "viewed" if they exist in progress; "completed" if completed: true
+        const completedCount = allContentIds.filter(id => 
+            userProgress.some(p => p.contentId === id && p.completed)
+        ).length
+        
+        const progressPercentage = totalContent > 0 
+            ? Math.round((completedCount / totalContent) * 100) 
+            : 0
+
+        // Find the most recent activity for this subject
+        const subjectProgressEntries = userProgress.filter(p => allContentIds.includes(p.contentId))
+        const latestStats = subjectProgressEntries.length > 0 
+            ? Math.max(...subjectProgressEntries.map(p => p.lastAccessed.getTime())) 
+            : 0
+
+        // Format the URL slug
+        const subjectSlug = `/icse-class-${subject.class}-${subject.name.toLowerCase().replace(/\s+/g, '-')}`
+
+        return {
+            ...subject,
+            progressPercentage,
+            lastAccessed: latestStats,
+            subjectSlug
+        }
+    })
+
+    // "Continue Learning" section: showed subjects with recent activity first, followed by others
+    const sortedSubjects = [...subjectsWithProgress].sort((a, b) => b.lastAccessed - a.lastAccessed)
 
     return (
         <div className="min-h-screen bg-slate-50 pt-24 pb-20">
@@ -96,21 +145,26 @@ export default async function DashboardPage() {
                                 Continue Learning
                             </h2>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {accessibleSubjects.map((subject) => (
+                                {sortedSubjects.map((subject) => (
                                     <Card key={subject.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                                        <CardHeader className="pb-3">
+                                        <CardHeader className="pb-3 text-left">
                                             <CardTitle className="text-lg font-bold text-slate-900">{subject.name}</CardTitle>
                                             <CardDescription>Class {subject.class}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="w-full bg-slate-100 rounded-full h-2 mb-2">
-                                                {/* In a real app, calculate true progress here */}
-                                                <div className="bg-teal-500 h-2 rounded-full" style={{ width: "10%" }}></div>
+                                            <div className="flex justify-between items-end mb-1">
+                                                <span className="text-xs font-bold text-teal-600">{subject.progressPercentage}%</span>
+                                                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Completed</span>
                                             </div>
-                                            <p className="text-xs text-slate-500 text-right">Begin Course</p>
+                                            <div className="w-full bg-slate-100 rounded-full h-2 mb-4">
+                                                <div 
+                                                    className="bg-teal-500 h-2 rounded-full transition-all duration-500" 
+                                                    style={{ width: `${subject.progressPercentage}%` }}
+                                                ></div>
+                                            </div>
 
-                                            <NavButton className="w-full mt-4" variant="outline" href={`/icse-class-${subject.class}-${subject.name.toLowerCase()}`}>
-                                                Start Now
+                                            <NavButton className="w-full" variant={subject.progressPercentage > 0 ? "default" : "outline"} href={subject.subjectSlug}>
+                                                {subject.progressPercentage === 100 ? "Review Course" : (subject.progressPercentage > 0 ? "Continue" : "Start Now")}
                                             </NavButton>
                                         </CardContent>
                                     </Card>

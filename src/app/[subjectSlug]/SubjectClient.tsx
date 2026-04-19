@@ -72,7 +72,9 @@ export default function SubjectClient({ subject, hasAccess, subjectSlug }: Subje
                                     {unlocked ? (
                                         <span className="inline-block px-2.5 py-0.5 rounded-full bg-secondary/10 text-secondary text-xs font-semibold">{isFree ? 'FREE' : 'UNLOCKED'}</span>
                                     ) : (
-                                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">Premium</span>
+                                        <Link href="/pricing">
+                                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-colors">Premium</span>
+                                        </Link>
                                     )}
                                 </td>
                                 <td className="py-4 px-4 text-center">

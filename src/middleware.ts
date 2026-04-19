@@ -31,6 +31,16 @@ export default auth((req) => {
         }
     }
 
+    // Protect admin routes
+    if (pathname.startsWith("/admin")) {
+        if (!isLoggedIn) {
+            return NextResponse.redirect(new URL("/login", req.url))
+        }
+        if (req.auth?.user?.role !== "ADMIN") {
+            return NextResponse.redirect(new URL("/dashboard", req.url))
+        }
+    }
+
     // Redirect logged-in users away from login/register pages
     if ((pathname === "/login" || pathname === "/register") && isLoggedIn) {
         return NextResponse.redirect(new URL("/dashboard", req.url))

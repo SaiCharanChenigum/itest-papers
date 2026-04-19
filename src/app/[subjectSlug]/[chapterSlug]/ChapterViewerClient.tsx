@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Lock, Download, FileText, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NavButton } from "@/components/ui/NavButton";
 import dynamic from "next/dynamic";
 
 // Dynamic import for the PDF viewer to prevent "canvas" error and SSR issues
-const DynamicPDFViewer = dynamic(() => import("@/components/pdf/DynamicPDFViewer"), { 
+const DynamicPDFViewer = dynamic(() => import("@/components/pdf/DynamicPDFViewer"), {
     ssr: false,
     loading: () => <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center text-slate-400">Loading PDF Viewer...</div>
 });
@@ -27,7 +28,16 @@ interface ChapterViewerClientProps {
 }
 
 export default function ChapterViewerClient({ contents, hasPremiumAccess }: ChapterViewerClientProps) {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const searchParams = useSearchParams();
+    const initialTab = searchParams.get("tab");
+    
+    const [activeIndex, setActiveIndex] = useState(() => {
+        if (initialTab) {
+            const index = contents.findIndex(c => c.type === initialTab);
+            return index !== -1 ? index : 0;
+        }
+        return 0;
+    });
     const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
     const activeItem = contents[activeIndex];
 
@@ -100,13 +110,13 @@ export default function ChapterViewerClient({ contents, hasPremiumAccess }: Chap
                     activeItem.exists ? (
                         <div className="flex flex-col">
                             <div className="w-full h-[600px] sm:h-[800px] bg-slate-200 relative border-b border-border overflow-hidden">
-                                <DynamicPDFViewer 
-                                    fileUrl={displayUrl} 
-                                    onPageChange={handlePageChange} 
+                                <DynamicPDFViewer
+                                    fileUrl={displayUrl}
+                                    onPageChange={handlePageChange}
                                 />
                             </div>
                             <div className="bg-slate-50 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                <p className="text-sm text-slate-500 font-medium">Read to the last page to mark as completed.</p>
+                                {/* <p className="text-sm text-slate-500 font-medium">Read to the last page to mark as completed.</p> */}
                                 <Button size="default" className="w-full sm:w-auto font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm" asChild>
                                     <a href={displayUrl} target="_blank" rel="noopener noreferrer" download>
                                         <Download className="mr-2 h-4 w-4" /> Download PDF
@@ -115,35 +125,35 @@ export default function ChapterViewerClient({ contents, hasPremiumAccess }: Chap
                             </div>
                         </div>
                     ) : (
-                            <div className="w-full py-24 bg-slate-50 relative flex flex-col items-center justify-center border-t border-border/50 text-center px-4">
-                                <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4 text-slate-400">
-                                    <FileText className="w-8 h-8 opacity-50" />
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">Document Unavailable</h3>
-                                <p className="text-slate-500 max-w-md">
-                                    The PDF file for this chapter has not been uploaded to the server yet. Please check back later.
-                                </p>
+                        <div className="w-full py-24 bg-slate-50 relative flex flex-col items-center justify-center border-t border-border/50 text-center px-4">
+                            <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                                <FileText className="w-8 h-8 opacity-50" />
                             </div>
-                        )
-                    ) : (
-                        <div className="w-full h-[400px] bg-slate-50 relative flex items-center justify-center border-t border-border/50">
-                            <div className="absolute inset-0 bg-background/60 backdrop-blur-[3px] z-10 flex flex-col items-center justify-center text-center p-4">
-                                <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm border border-teal-100 relative z-20">
-                                    <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
-                                        <Lock className="w-6 h-6" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-2">Premium Document</h3>
-                                    <p className="text-sm text-slate-600 mb-6">
-                                        This document is locked. Upgrade to premium to view and download this material.
-                                    </p>
-                                    <NavButton href="/pricing" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold border-0 shadow-lg shadow-orange-500/20">
-                                        Unlock Full Access
-                                    </NavButton>
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">Document Unavailable</h3>
+                            <p className="text-slate-500 max-w-md">
+                                The PDF file for this chapter has not been uploaded to the server yet. Please check back later.
+                            </p>
+                        </div>
+                    )
+                ) : (
+                    <div className="w-full h-[400px] bg-slate-50 relative flex items-center justify-center border-t border-border/50">
+                        <div className="absolute inset-0 bg-background/60 backdrop-blur-[3px] z-10 flex flex-col items-center justify-center text-center p-4">
+                            <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm border border-teal-100 relative z-20">
+                                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
+                                    <Lock className="w-6 h-6" />
                                 </div>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">Premium Document</h3>
+                                <p className="text-sm text-slate-600 mb-6">
+                                    This document is locked. Upgrade to premium to view and download this material.
+                                </p>
+                                <NavButton href="/pricing" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold border-0 shadow-lg shadow-orange-500/20">
+                                    Unlock Full Access
+                                </NavButton>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
+        </div>
     );
 }

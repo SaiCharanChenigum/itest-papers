@@ -48,7 +48,7 @@ export default function SubjectClient({ subject, hasAccess, subjectSlug }: Subje
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                     {unlocked ? (
-                                        <Link href={`/${subjectSlug}/${ch.id}`} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+                                        <Link href={`/${subjectSlug}/${ch.id}?tab=NOTES`} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
                                             <Eye className="h-3.5 w-3.5" /> View
                                         </Link>
                                     ) : (
@@ -59,7 +59,7 @@ export default function SubjectClient({ subject, hasAccess, subjectSlug }: Subje
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                     {unlocked ? (
-                                        <Link href={`/${subjectSlug}/${ch.id}`} className="inline-flex items-center gap-1 text-sm text-secondary hover:underline">
+                                        <Link href={`/${subjectSlug}/${ch.id}?tab=TEST_PAPER`} className="inline-flex items-center gap-1 text-sm text-secondary hover:underline">
                                             <FileText className="h-3.5 w-3.5" /> Attempt
                                         </Link>
                                     ) : (

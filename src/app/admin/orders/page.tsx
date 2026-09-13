@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import OrderTable from "@/components/admin/OrderTable";
 import { Package } from "lucide-react";
-
+import ContentManagerClient from "./ContentManagerClient";
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
@@ -38,6 +38,22 @@ export default async function AdminOrdersPage() {
     // Serialize orders for client-side use (handling date conversion)
     const serializedOrders = JSON.parse(JSON.stringify(orders));
 
+    // Fetch subjects and content for management
+    const subjects = await prisma.subject.findMany({
+        include: {
+            chapters: {
+                include: {
+                    contents: {
+                        orderBy: { order: "asc" }
+                    }
+                },
+                orderBy: { order: "asc" }
+            }
+        },
+        orderBy: { class: "asc" }
+    });
+
+
     return (
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -55,6 +71,7 @@ export default async function AdminOrdersPage() {
             </div>
 
             <OrderTable initialOrders={serializedOrders} />
+            <ContentManagerClient initialSubjects={subjects} />
         </div>
     );
 }

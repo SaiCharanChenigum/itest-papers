@@ -77,8 +77,8 @@ const ChapterPage = async ({ params }: ChapterPageProps) => {
                 {chapter.contents.length > 0 ? (
                     <ChapterViewerClient
                         contents={chapter.contents.map(c => {
-                            const filePath = path.join(process.cwd(), 'public', c.fileUrl);
-                            const fileExists = fs.existsSync(filePath);
+                            const isExternalUrl = c.fileUrl.startsWith('http');
+                            const fileExists = isExternalUrl ? true : fs.existsSync(path.join(process.cwd(), 'public', c.fileUrl));
                             return {
                                 id: c.id,
                                 title: c.title,

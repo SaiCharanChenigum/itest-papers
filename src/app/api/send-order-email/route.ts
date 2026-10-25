@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
             template_id: process.env.EMAILJS_ORDER_TEMPLATE_ID!,
             user_id: process.env.EMAILJS_PUBLIC_KEY!,
             template_params: {
-                to_email: "saic9524@gmail.com",
+                to_email: "itestpapers@gmail.com",
                 order_number: orderDetails.orderNumber,
                 amount: orderDetails.totalAmount,
                 payment_method: orderDetails.paymentMethod,

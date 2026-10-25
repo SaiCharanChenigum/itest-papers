@@ -93,15 +93,18 @@ model Subject {
   id          String   @id @default(uuid())
   name        String   // Biology / Chemistry
   class       Int      // 9 or 10
+  board       String   @default("ICSE") // "ICSE" | "IGCSE"
   description String?
   isActive    Boolean  @default(true)
   imageUrl    String?  // Subject icon/image
+  slots       String[] @default(["NOTES", "TEST_PAPER"])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   chapters Chapter[]
 
+  @@index([board, class, isActive])
   @@index([class, isActive])
 }
 
@@ -128,7 +131,7 @@ model Content {
   id          String      @id @default(uuid())
   title       String
   description String?
-  type        ContentType
+  type        String      // e.g., NOTES, TEST_PAPER, SOLUTION, or any custom slot name
   fileUrl     String      // Path or URL to PDF file
   isFree      Boolean     @default(false)
   order       Int         @default(0) // Display order within chapter
@@ -143,13 +146,6 @@ model Content {
 
   @@index([chapterId, order])
   @@index([isFree])
-}
-
-enum ContentType {
-  NOTES
-  TEST_PAPER
-  SOLUTION
-  SAMPLE_PAPER
 }
 
 // ============================================
@@ -300,6 +296,17 @@ model UserProgress {
   
   @@unique([userId, contentId])
   @@index([userId])
+}
+
+model MaterialPreview {
+  id        String   @id @default(uuid())
+  title     String
+  imageUrl  String
+  width     Int?     @default(640)
+  height    Int?     @default(800)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 

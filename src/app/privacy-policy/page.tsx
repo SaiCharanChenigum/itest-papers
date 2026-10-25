@@ -82,7 +82,7 @@ export default function PrivacyPolicyPage() {
                     <div className="space-y-4 border-t border-border pt-12">
                         <h2 className="text-xl font-bold text-foreground">Contact Us</h2>
                         <p className="text-muted-foreground leading-relaxed">
-                            If you have any questions or concerns about this privacy policy, please reach out via our <a href="/contact" className="text-primary hover:underline">Contact Us</a> page or email us directly at itestpapers.support@gmail.com.
+                            If you have any questions or concerns about this privacy policy, please reach out via our <a href="/contact" className="text-primary hover:underline">Contact Us</a> page or email us directly at itestpapers@gmail.com.
                         </p>
                     </div>
                 </div>

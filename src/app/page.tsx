@@ -22,13 +22,22 @@ export default async function Home() {
     hasSubscription = !!sub;
   }
 
+  let previews: any[] = [];
+  try {
+    previews = await prisma.$queryRawUnsafe<any[]>(
+      'SELECT id, title, "imageUrl", width, height, "order" FROM "MaterialPreview" ORDER BY "order" ASC, "createdAt" ASC'
+    );
+  } catch (e) {
+    console.error("Failed to load material previews:", e);
+  }
+
   return (
     <>
       <HeroSection />
       <TrustSection />
       <SubjectsGrid />
       <HowItWorks />
-      <SamplePreview hasSubscription={hasSubscription} />
+      <SamplePreview hasSubscription={hasSubscription} previews={previews} />
       <ProfessorSection />
     </>
   );

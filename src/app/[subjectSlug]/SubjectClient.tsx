@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Lock, Eye, FileText, ArrowRight, ShoppingCart, Check } from "lucide-react";
+import { Lock, Eye, FileText, ArrowRight, ShoppingCart, Check, Mail } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NavButton } from "@/components/ui/NavButton";
 import { useCart } from "@/context/CartContext";
@@ -44,7 +44,9 @@ export default function SubjectClient({ subject, hasAccess, subjectSlug }: Subje
                         return (
                             <tr key={ch.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
                                 <td className="py-4 px-4">
-                                    <span className="font-medium text-sm">{ch.title}</span>
+                                    <Link href={`/${subjectSlug}/${ch.id}`} className="font-medium text-sm hover:text-primary hover:underline">
+                                        {ch.title}
+                                    </Link>
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                     {unlocked ? (
@@ -121,6 +123,33 @@ export default function SubjectClient({ subject, hasAccess, subjectSlug }: Subje
                     </NavButton>
                 </div>
             )}
+
+            {/* Solutions Inquiry Notice */}
+            <div className="mt-8 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 border border-blue-100 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+                <div className="flex items-start gap-3.5">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                        <Mail className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-foreground text-sm sm:text-base">Looking for Test Paper Solutions?</h4>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                            For complete step-by-step solutions and answer keys, please reach out to us at{" "}
+                            <a
+                                href="mailto:itestpapers@gmail.com"
+                                className="font-semibold text-primary hover:underline"
+                            >
+                                itestpapers@gmail.com
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                <a
+                    href="mailto:itestpapers@gmail.com?subject=Request%20for%20Solutions%20-%20ICSE"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-border hover:border-primary/40 text-foreground font-semibold text-xs sm:text-sm shadow-xs hover:bg-accent transition-colors shrink-0"
+                >
+                    <Mail className="h-4 w-4 text-primary" /> Email for Solutions
+                </a>
+            </div>
         </div>
     );
 }

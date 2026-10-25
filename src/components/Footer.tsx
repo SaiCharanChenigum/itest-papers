@@ -16,10 +16,11 @@ const Footer = () => (
                 <div>
                     <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider text-primary-foreground/50">Subjects</h4>
                     <ul className="space-y-2 text-sm text-primary-foreground/70">
-                        <li><Link href="/icse-class-9-biology" className="hover:text-primary-foreground transition-colors">Class 9 Biology</Link></li>
-                        <li><Link href="/icse-class-9-chemistry" className="hover:text-primary-foreground transition-colors">Class 9 Chemistry</Link></li>
-                        <li><Link href="/icse-class-10-biology" className="hover:text-primary-foreground transition-colors">Class 10 Biology</Link></li>
-                        <li><Link href="/icse-class-10-chemistry" className="hover:text-primary-foreground transition-colors">Class 10 Chemistry</Link></li>
+                        <li><Link href="/icse-class-9-biology" className="hover:text-primary-foreground transition-colors">Class 9 Biology (ICSE)</Link></li>
+                        <li><Link href="/icse-class-9-chemistry" className="hover:text-primary-foreground transition-colors">Class 9 Chemistry (ICSE)</Link></li>
+                        <li><Link href="/icse-class-10-biology" className="hover:text-primary-foreground transition-colors">Class 10 Biology (ICSE)</Link></li>
+                        <li><Link href="/icse-class-10-chemistry" className="hover:text-primary-foreground transition-colors">Class 10 Chemistry (ICSE)</Link></li>
+                        <li><Link href="/igcse" className="hover:text-primary-foreground transition-colors font-medium text-primary">IGCSE Materials</Link></li>
                     </ul>
                 </div>
 

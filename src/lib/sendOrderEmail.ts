@@ -7,7 +7,7 @@ export const sendOrderEmail = async (orderDetails: any) => {
             template_id: process.env.EMAILJS_ORDER_TEMPLATE_ID || "template_ayqmmaj", // Using generic for now
             user_id: process.env.EMAILJS_PUBLIC_KEY || "ejWUMJJ_b0PSuayNW",
             template_params: {
-                to_email: "saic9524@gmail.com",
+                to_email: "itestpapers@gmail.com",
                 order_number: orderDetails.orderNumber,
                 amount: orderDetails.totalAmount,
                 payment_method: orderDetails.paymentMethod,

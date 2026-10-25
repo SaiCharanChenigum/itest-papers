@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import fs from "fs";
 import path from "path";
+import { Mail } from "lucide-react";
 import ChapterViewerClient from "./ChapterViewerClient";
 
 interface ChapterPageProps {
@@ -58,6 +59,57 @@ const ChapterPage = async ({ params }: ChapterPageProps) => {
         if (subscription) hasAccess = true;
     }
 
+    // Query configured slots for this subject
+    let subjectSlots: string[] = ['NOTES', 'TEST_PAPER'];
+    try {
+        const rows = await prisma.$queryRawUnsafe<Array<{ slots: string[] | null }>>(
+            'SELECT slots FROM "Subject" WHERE id = $1',
+            subject.id
+        );
+        if (rows[0]?.slots && rows[0].slots.length > 0) {
+            subjectSlots = rows[0].slots;
+        }
+    } catch (e) {
+        console.error("Failed to fetch slots for subject:", e);
+    }
+
+    // Merge configured subject slots with existing uploaded chapter contents
+    const allSlotTypes = Array.from(new Set([...subjectSlots, ...chapter.contents.map(c => c.type)]));
+
+    const formatSlotTitle = (typeStr: string) => {
+        return typeStr
+            .replace(/_/g, ' ')
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase());
+    };
+
+    const finalContents = allSlotTypes.map(slotType => {
+        const found = chapter.contents.find(c => c.type === slotType);
+        if (found) {
+            const isExternalUrl = found.fileUrl.startsWith('http');
+            const fileExists = isExternalUrl ? true : fs.existsSync(path.join(process.cwd(), 'public', found.fileUrl));
+            return {
+                id: found.id,
+                title: found.title,
+                type: found.type,
+                fileUrl: found.fileUrl,
+                isFree: found.isFree,
+                exists: fileExists,
+                isComingSoon: false
+            };
+        } else {
+            return {
+                id: `coming-soon-${slotType}`,
+                title: `${chapter.title} ${formatSlotTitle(slotType)}`,
+                type: slotType,
+                fileUrl: "",
+                isFree: true,
+                exists: false,
+                isComingSoon: true
+            };
+        }
+    });
+
     return (
         <article className="section-padding">
             <div className="container-main max-w-5xl">
@@ -74,27 +126,43 @@ const ChapterPage = async ({ params }: ChapterPageProps) => {
                     ICSE Class {subject.class} {subject.name} – {chapter.title}
                 </h1>
 
-                {chapter.contents.length > 0 ? (
+                {finalContents.length > 0 ? (
                     <ChapterViewerClient
-                        contents={chapter.contents.map(c => {
-                            const isExternalUrl = c.fileUrl.startsWith('http');
-                            const fileExists = isExternalUrl ? true : fs.existsSync(path.join(process.cwd(), 'public', c.fileUrl));
-                            return {
-                                id: c.id,
-                                title: c.title,
-                                type: c.type,
-                                fileUrl: c.fileUrl,
-                                isFree: c.isFree,
-                                exists: fileExists
-                            };
-                        })}
+                        contents={finalContents}
                         hasPremiumAccess={hasAccess}
                     />
                 ) : (
                     <div className="text-center py-12 card-academic bg-slate-50 border-dashed">
-                        <p className="text-muted-foreground">No study materials have been uploaded for this chapter yet.</p>
+                        <p className="text-muted-foreground">No study materials have been configured for this chapter yet.</p>
                     </div>
                 )}
+
+                {/* Solutions Notice */}
+                <div className="mt-10 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 border border-blue-100 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+                    <div className="flex items-start gap-3.5">
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                            <Mail className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-foreground text-sm sm:text-base">Looking for Test Paper Solutions?</h4>
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                                For complete step-by-step solutions and answer keys, please reach out to us at{" "}
+                                <a
+                                    href="mailto:itestpapers@gmail.com"
+                                    className="font-semibold text-primary hover:underline"
+                                >
+                                    itestpapers@gmail.com
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <a
+                        href="mailto:itestpapers@gmail.com?subject=Request%20for%20Solutions%20-%20ICSE"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-border hover:border-primary/40 text-foreground font-semibold text-xs sm:text-sm shadow-xs hover:bg-accent transition-colors shrink-0"
+                    >
+                        <Mail className="h-4 w-4 text-primary" /> Email for Solutions
+                    </a>
+                </div>
             </div>
         </article>
     );

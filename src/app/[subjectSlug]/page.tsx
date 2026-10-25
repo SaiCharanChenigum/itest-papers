@@ -14,8 +14,9 @@ const SubjectPage = async ({ params }: SubjectPageProps) => {
     const resolvedParams = await params;
     const subjectSlug = resolvedParams.subjectSlug;
 
-    // Parse class and subject from slug e.g. "icse-class-9-biology" -> class: 9, subject: "Biology"
+    // Parse board, class and subject from slug e.g. "icse-class-9-biology" -> board: "ICSE", class: 9, subject: "Biology"
     const slugParts = subjectSlug.split("-");
+    const boardFromSlug = slugParts[0]?.toUpperCase() === "IGCSE" ? "IGCSE" : "ICSE";
     const classLevel = parseInt(slugParts[2]);
     const subjectName = slugParts[3] ? slugParts[3].charAt(0).toUpperCase() + slugParts[3].slice(1) : "";
 
@@ -23,15 +24,28 @@ const SubjectPage = async ({ params }: SubjectPageProps) => {
         return notFound();
     }
 
-    const subject = await prisma.subject.findFirst({
-        where: {
-            class: classLevel,
-            name: {
-                equals: subjectName,
-                mode: "insensitive"
-            },
-            isActive: true
-        },
+    // Find matching subject ID using direct SQL to match board, class and name without Prisma client validation errors
+    let subjectId: string | null = null;
+    try {
+        const matchingRows = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
+            'SELECT id FROM "Subject" WHERE class = $1 AND LOWER(name) = LOWER($2) AND UPPER(board) = UPPER($3) AND "isActive" = true LIMIT 1',
+            classLevel,
+            subjectName,
+            boardFromSlug
+        );
+        if (matchingRows.length > 0) {
+            subjectId = matchingRows[0].id;
+        }
+    } catch (e) {
+        console.error("Failed to find subject by raw query:", e);
+    }
+
+    if (!subjectId) {
+        return notFound();
+    }
+
+    const subject = await prisma.subject.findUnique({
+        where: { id: subjectId },
         include: {
             chapters: {
                 orderBy: {
@@ -72,8 +86,9 @@ const SubjectPage = async ({ params }: SubjectPageProps) => {
         if (subscription) hasAccess = true;
     }
 
-    const seoTitle = `ICSE Class ${subject.class} ${subject.name} Notes & Test Papers`;
-    const title = `ICSE Class ${subject.class} ${subject.name}`;
+    const currentBoard = (subject as any).board || boardFromSlug;
+    const seoTitle = `${currentBoard} Class ${subject.class} ${subject.name} Notes & Test Papers`;
+    const title = `${currentBoard} Class ${subject.class} ${subject.name}`;
 
     return (
         <section className="section-padding">
@@ -81,7 +96,12 @@ const SubjectPage = async ({ params }: SubjectPageProps) => {
                 {/* Breadcrumb */}
                 <nav className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5">
                     <Link href="/" className="hover:text-primary">Home</Link>
-                    <span>/</span>
+                    {currentBoard === "IGCSE" ? (
+                        <>
+                            <Link href="/igcse" className="hover:text-primary">{currentBoard}</Link>
+                            <span>/</span>
+                        </>
+                    ) : null}
                     <span className="text-foreground font-medium">{title}</span>
                 </nav>
 

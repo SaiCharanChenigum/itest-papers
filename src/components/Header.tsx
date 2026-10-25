@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { NavButton } from "@/components/ui/NavButton";
 import { useCart } from "@/context/CartContext";
 
-const subjects = [
+const icseSubjects = [
   { label: "ICSE Class 9 Biology", to: "/icse-class-9-biology" },
   { label: "ICSE Class 9 Chemistry", to: "/icse-class-9-chemistry" },
   { label: "ICSE Class 10 Biology", to: "/icse-class-10-biology" },
@@ -19,7 +19,7 @@ const subjects = [
 const Header = () => {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [subjectsOpen, setSubjectsOpen] = useState(false);
+  const [icseOpen, setIcseOpen] = useState(false);
   const pathname = usePathname();
   const { cartCount } = useCart();
 
@@ -41,13 +41,14 @@ const Header = () => {
             Home
           </Link>
 
+          {/* ICSE Section */}
           <div className="relative group">
             <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent">
-              Subjects <ChevronDown className="h-3.5 w-3.5" />
+              ICSE <ChevronDown className="h-3.5 w-3.5" />
             </button>
             <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <div className="bg-card border border-border rounded-xl shadow-lg p-2 min-w-[220px]">
-                {subjects.map((s) => (
+              <div className="bg-card border border-border rounded-xl shadow-lg p-2 min-w-[230px]">
+                {icseSubjects.map((s) => (
                   <NavButton
                     key={s.to}
                     href={s.to}
@@ -61,6 +62,14 @@ const Header = () => {
               </div>
             </div>
           </div>
+
+          {/* IGCSE Section */}
+          <Link
+            href="/igcse"
+            className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent"
+          >
+            IGCSE
+          </Link>
 
           <Link href="/pricing" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-lg hover:bg-accent">
             Pricing
@@ -107,12 +116,13 @@ const Header = () => {
           <nav className="px-4 py-4 space-y-1">
             <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">Home</Link>
 
-            <button onClick={() => setSubjectsOpen(!subjectsOpen)} className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">
-              Subjects <ChevronDown className={`h-3.5 w-3.5 transition-transform ${subjectsOpen ? "rotate-180" : ""}`} />
+            {/* Mobile ICSE Accordion */}
+            <button onClick={() => setIcseOpen(!icseOpen)} className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">
+              ICSE <ChevronDown className={`h-3.5 w-3.5 transition-transform ${icseOpen ? "rotate-180" : ""}`} />
             </button>
-            {subjectsOpen && (
+            {icseOpen && (
               <div className="pl-4 space-y-1">
-                {subjects.map((s) => (
+                {icseSubjects.map((s) => (
                   <NavButton
                     key={s.to}
                     href={s.to}
@@ -125,6 +135,15 @@ const Header = () => {
                 ))}
               </div>
             )}
+
+            {/* Mobile IGCSE Link */}
+            <Link
+              href="/igcse"
+              onClick={() => setMobileOpen(false)}
+              className="block px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent"
+            >
+              IGCSE
+            </Link>
 
             <Link href="/pricing" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent">Pricing</Link>
             <Link

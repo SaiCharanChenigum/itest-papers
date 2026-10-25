@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Microscope, FlaskConical } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { NavButton } from "@/components/ui/NavButton";
 
 const subjects = [

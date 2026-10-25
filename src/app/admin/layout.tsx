@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Package, LayoutDashboard, Settings, User } from "lucide-react";
+import { Package, LayoutDashboard, Settings, User, Image as ImageIcon, BookOpen } from "lucide-react";
 
 export default function AdminLayout({
     children,
@@ -18,10 +18,24 @@ export default function AdminLayout({
                 <nav className="flex-1 p-4 space-y-1">
                     <Link
                         href="/admin/orders"
-                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md bg-accent text-accent-foreground"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
                         <Package className="h-4 w-4" />
                         Manage Orders
+                    </Link>
+                    <Link
+                        href="/admin/orders#preview-materials"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <ImageIcon className="h-4 w-4" />
+                        Homepage Previews
+                    </Link>
+                    <Link
+                        href="/admin/orders#content-manager"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <BookOpen className="h-4 w-4" />
+                        Curriculum Content
                     </Link>
                     <Link
                         href="/dashboard"

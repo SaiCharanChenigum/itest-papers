@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Package, LayoutDashboard, Settings, User, Image as ImageIcon, BookOpen } from "lucide-react";
+import { Package, LayoutDashboard, Settings, User, Image as ImageIcon, BookOpen, IndianRupee, Crown, Sparkles, Shapes } from "lucide-react";
 
 export default function AdminLayout({
     children,
@@ -22,6 +22,34 @@ export default function AdminLayout({
                     >
                         <Package className="h-4 w-4" />
                         Manage Orders
+                    </Link>
+                    <Link
+                        href="/admin/orders#subscriptions"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <Crown className="h-4 w-4" />
+                        Subscriptions
+                    </Link>
+                    <Link
+                        href="/admin/orders#pricing-rates"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <IndianRupee className="h-4 w-4" />
+                        Pricing Rates
+                    </Link>
+                    <Link
+                        href="/admin/orders#hero-image"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <Sparkles className="h-4 w-4" />
+                        Hero Image
+                    </Link>
+                    <Link
+                        href="/admin/orders#homepage-banner"
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                        <Shapes className="h-4 w-4" />
+                        Custom Banner
                     </Link>
                     <Link
                         href="/admin/orders#preview-materials"
@@ -65,7 +93,7 @@ export default function AdminLayout({
                 </header>
 
                 <div className="flex-1 section-padding">
-                    <div className="container-main max-w-6xl">
+                    <div className="container-main max-w-[1440px]">
                         {children}
                     </div>
                 </div>

@@ -309,4 +309,13 @@ model MaterialPreview {
   updatedAt DateTime @updatedAt
 }
 
+model PricingPlan {
+  id        String   @id @default(uuid())
+  planKey   String   @unique
+  name      String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 

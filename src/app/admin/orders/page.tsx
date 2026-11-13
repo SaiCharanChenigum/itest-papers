@@ -2,9 +2,16 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import OrderTable from "@/components/admin/OrderTable";
-import { Package } from "lucide-react";
+import SubscriptionTable from "@/components/admin/SubscriptionTable";
+import { Package, Crown } from "lucide-react";
 import ContentManagerClient from "./ContentManagerClient";
 import MaterialPreviewManager from "@/components/admin/MaterialPreviewManager";
+import PricingRateManager from "@/components/admin/PricingRateManager";
+import HeroImageManager from "@/components/admin/HeroImageManager";
+import BannerStudio from "@/components/admin/BannerStudio";
+import { getPricingRates } from "@/lib/pricing";
+import { getHeroImageUrl } from "@/lib/hero";
+import { getHomepageBanner } from "@/lib/banner";
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
@@ -38,6 +45,27 @@ export default async function AdminOrdersPage() {
 
     // Serialize orders for client-side use (handling date conversion)
     const serializedOrders = JSON.parse(JSON.stringify(orders));
+
+    // Fetch all student subscriptions
+    const subscriptions = await prisma.subscription.findMany({
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    email: true,
+                    phone: true,
+                },
+            },
+            payment: {
+                select: {
+                    razorpayPaymentId: true,
+                    razorpayOrderId: true,
+                },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+    const serializedSubscriptions = JSON.parse(JSON.stringify(subscriptions));
 
     // Fetch subjects and content for management
     const subjects = await prisma.subject.findMany({
@@ -88,6 +116,15 @@ export default async function AdminOrdersPage() {
         console.error("Failed to fetch material previews via raw query:", e);
     }
 
+    // Fetch dynamic pricing rates
+    const initialRates = await getPricingRates();
+
+    // Fetch dynamic hero image
+    const initialHeroImage = await getHeroImageUrl();
+
+    // Fetch dynamic homepage banner
+    const initialBanner = await getHomepageBanner();
+
     return (
         <div className="space-y-12">
             <div id="orders" className="space-y-6">
@@ -106,6 +143,40 @@ export default async function AdminOrdersPage() {
                 </div>
 
                 <OrderTable initialOrders={serializedOrders} />
+            </div>
+
+            {/* Student Subscriptions & 1-Year Expiries Section */}
+            <div id="subscriptions" className="space-y-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                            <Crown className="h-7 w-7 text-amber-500" /> Student Subscriptions
+                        </h2>
+                        <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                            Track student premium plans, 1-year expiry timelines, and active access privileges.
+                        </p>
+                    </div>
+                    <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">
+                        <span className="text-sm font-semibold text-amber-700">
+                            {serializedSubscriptions.length} Total Subscriptions
+                        </span>
+                    </div>
+                </div>
+
+                <SubscriptionTable initialSubscriptions={serializedSubscriptions} />
+            </div>
+
+            {/* Subscription Pricing Rates Section */}
+            <PricingRateManager initialRates={initialRates} />
+
+            {/* Homepage Hero Image Section */}
+            <div id="hero-image">
+                <HeroImageManager initialHeroImage={initialHeroImage} />
+            </div>
+
+            {/* Homepage Custom Canvas Banner Section */}
+            <div id="homepage-banner">
+                <BannerStudio initialBanner={initialBanner} />
             </div>
 
             {/* Homepage Material Previews Section */}

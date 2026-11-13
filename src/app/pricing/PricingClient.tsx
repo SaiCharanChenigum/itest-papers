@@ -6,60 +6,98 @@ import { Check, ArrowRight, X, CheckCircle2, AlertCircle, BadgeCheck } from "luc
 import { Button } from "@/components/ui/Button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-const plans = [
-    {
-        name: "Free",
-        price: "₹0",
-        period: "forever",
-        features: ["1 Chapter Access", "Preview Notes", "Basic Support"],
-        cta: "Get Started",
-        popular: false,
-        planKey: null,
-    },
-    {
-        name: "Premium",
-        price: "₹299",
-        period: "per class",
-        features: ["Full Class Access (Bio & Chem)", "All Test Papers", "Solutions & Answers", "Download PDFs", "Priority Support"],
-        cta: "Select Class",
-        popular: true,
-        planKey: "PREMIUM_SELECT",
-    },
-    {
-        name: "Combo",
-        price: "₹499",
-        period: "all subjects",
-        features: ["Class 9 + 10 Access", "All Subjects Included", "All Test Papers", "Download Everything", "Priority Support"],
-        cta: "Get Combo",
-        popular: false,
-        planKey: "ALL_ACCESS",
-    },
-];
+import { PricingRates, DEFAULT_PRICING_RATES } from "@/lib/pricing";
 
 interface UserSubscriptions {
     class9: boolean;
     class10: boolean;
     combo: boolean;
+    class9EndsAt?: string | null;
+    class10EndsAt?: string | null;
+    comboEndsAt?: string | null;
 }
 
 interface PricingClientProps {
     userSubscriptions: UserSubscriptions;
+    rates?: PricingRates;
 }
 
-const SubscribedBadge = () => (
-    <div className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-secondary/10 text-secondary font-semibold text-sm border border-secondary/20">
-        <BadgeCheck className="h-4 w-4" />
-        Subscribed
-    </div>
-);
+const SubscribedBadge = ({ endsAt }: { endsAt?: string | null }) => {
+    const formatted = endsAt
+        ? new Date(endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : null;
 
-export default function PricingClient({ userSubscriptions }: PricingClientProps) {
+    return (
+        <div className="w-full flex flex-col items-center justify-center py-2 px-3 rounded-lg bg-secondary/10 text-secondary border border-secondary/20">
+            <div className="flex items-center gap-1.5 font-semibold text-sm">
+                <BadgeCheck className="h-4 w-4" />
+                Subscribed
+            </div>
+            {formatted && (
+                <span className="text-[11px] text-muted-foreground mt-0.5 font-medium">
+                    Valid for 1 year (until {formatted})
+                </span>
+            )}
+        </div>
+    );
+};
+
+export default function PricingClient({ userSubscriptions, rates }: PricingClientProps) {
     const { data: session } = useSession();
     const router = useRouter();
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [showClassModal, setShowClassModal] = useState(false);
     const [modalInfo, setModalInfo] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    const activeRates = rates || DEFAULT_PRICING_RATES;
+
+    const premiumPriceDisplay = activeRates.CLASS_9_FULL === activeRates.CLASS_10_FULL
+        ? `₹${activeRates.CLASS_9_FULL}`
+        : `₹${activeRates.CLASS_9_FULL} - ₹${activeRates.CLASS_10_FULL}`;
+
+    const plans = [
+        {
+            name: "Free",
+            price: "₹0",
+            period: "forever",
+            features: ["1 Chapter Access", "Preview Notes", "Basic Support"],
+            cta: "Get Started",
+            popular: false,
+            planKey: null,
+        },
+        {
+            name: "Premium",
+            price: premiumPriceDisplay,
+            period: "1 year / per class",
+            features: [
+                "1 Full Year of Unlimited Access",
+                "Full Class Access (Bio & Chem)",
+                "All Test Papers",
+                "Solutions & Answers",
+                "Download PDFs",
+                "Priority Support"
+            ],
+            cta: "Select Class",
+            popular: true,
+            planKey: "PREMIUM_SELECT",
+        },
+        {
+            name: "Combo",
+            price: `₹${activeRates.ALL_ACCESS}`,
+            period: "1 year / all subjects",
+            features: [
+                "1 Full Year of Unlimited Access",
+                "Class 9 + 10 Access",
+                "All Subjects Included",
+                "All Test Papers",
+                "Download Everything",
+                "Priority Support"
+            ],
+            cta: "Get Combo",
+            popular: false,
+            planKey: "ALL_ACCESS",
+        },
+    ];
 
     // Determine if the whole Premium plan is "used" (both classes subscribed or combo)
     const isPremiumFullySubscribed = userSubscriptions.combo || (userSubscriptions.class9 && userSubscriptions.class10);
@@ -189,18 +227,23 @@ export default function PricingClient({ userSubscriptions }: PricingClientProps)
                         </button>
 
                         <h2 className="text-xl font-bold mb-2">Select Your Class</h2>
-                        <p className="text-sm text-muted-foreground mb-6">Which class materials would you like to unlock for ₹299?</p>
+                        <p className="text-sm text-muted-foreground mb-6">Select which class materials you would like to unlock.</p>
 
                         <div className="space-y-3">
                             {/* Class 9 button — show Subscribed if already subscribed */}
                             {userSubscriptions.class9 || userSubscriptions.combo ? (
-                                <div className="w-full px-4">
-                                    <div className="flex items-center justify-between h-14">
+                                <div className="w-full px-4 py-2.5 rounded-xl bg-secondary/10 border border-secondary/20">
+                                    <div className="flex items-center justify-between">
                                         <span className="text-base font-medium">Class 9 (Bio & Chem)</span>
                                         <span className="flex items-center gap-1.5 text-sm text-secondary font-semibold">
                                             <BadgeCheck className="h-4 w-4" /> Subscribed
                                         </span>
                                     </div>
+                                    {(userSubscriptions.comboEndsAt || userSubscriptions.class9EndsAt) && (
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            Valid for 1 year (until {new Date(userSubscriptions.comboEndsAt || userSubscriptions.class9EndsAt!).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })})
+                                        </p>
+                                    )}
                                 </div>
                             ) : (
                                 <Button
@@ -209,20 +252,25 @@ export default function PricingClient({ userSubscriptions }: PricingClientProps)
                                     onClick={() => handleSubscribe("CLASS_9_FULL")}
                                     isLoading={loadingPlan === "CLASS_9_FULL"}
                                 >
-                                    <span>Class 9 (Bio & Chem)</span>
+                                    <span>Class 9 (Bio & Chem) — ₹{activeRates.CLASS_9_FULL}</span>
                                     {loadingPlan !== "CLASS_9_FULL" && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
                                 </Button>
                             )}
 
                             {/* Class 10 button — show Subscribed if already subscribed */}
                             {userSubscriptions.class10 || userSubscriptions.combo ? (
-                                <div className="w-full px-4">
-                                    <div className="flex items-center justify-between h-14">
+                                <div className="w-full px-4 py-2.5 rounded-xl bg-secondary/10 border border-secondary/20">
+                                    <div className="flex items-center justify-between">
                                         <span className="text-base font-medium">Class 10 (Bio & Chem)</span>
                                         <span className="flex items-center gap-1.5 text-sm text-secondary font-semibold">
                                             <BadgeCheck className="h-4 w-4" /> Subscribed
                                         </span>
                                     </div>
+                                    {(userSubscriptions.comboEndsAt || userSubscriptions.class10EndsAt) && (
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            Valid for 1 year (until {new Date(userSubscriptions.comboEndsAt || userSubscriptions.class10EndsAt!).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })})
+                                        </p>
+                                    )}
                                 </div>
                             ) : (
                                 <Button
@@ -231,7 +279,7 @@ export default function PricingClient({ userSubscriptions }: PricingClientProps)
                                     onClick={() => handleSubscribe("CLASS_10_FULL")}
                                     isLoading={loadingPlan === "CLASS_10_FULL"}
                                 >
-                                    <span>Class 10 (Bio & Chem)</span>
+                                    <span>Class 10 (Bio & Chem) — ₹{activeRates.CLASS_10_FULL}</span>
                                     {loadingPlan !== "CLASS_10_FULL" && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
                                 </Button>
                             )}
@@ -279,7 +327,13 @@ export default function PricingClient({ userSubscriptions }: PricingClientProps)
 
                                     {/* Show Subscribed badge OR the CTA button */}
                                     {isSubscribed ? (
-                                        <SubscribedBadge />
+                                        <SubscribedBadge
+                                            endsAt={
+                                                plan.planKey === "ALL_ACCESS"
+                                                    ? userSubscriptions.comboEndsAt
+                                                    : (userSubscriptions.comboEndsAt || userSubscriptions.class9EndsAt || userSubscriptions.class10EndsAt)
+                                            }
+                                        />
                                     ) : (
                                         <Button
                                             variant={plan.popular ? "default" : "outline"}

@@ -11,7 +11,7 @@ const items = [
 ];
 
 const TrustSection = () => (
-    <section className="section-alt section-padding">
+    <section className="section-alt py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
         <div className="container-main">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {items.map((item, i) => (

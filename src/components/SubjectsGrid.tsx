@@ -12,7 +12,7 @@ const subjects = [
 ];
 
 const SubjectsGrid = () => (
-    <section id="subjects" className="section-padding">
+    <section id="subjects" className="pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8">
         <div className="container-main">
             <div className="text-center mb-12">
                 <h2 className="text-2xl sm:text-3xl font-bold mb-3">Choose Your Subject</h2>

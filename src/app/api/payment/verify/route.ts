@@ -64,10 +64,24 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        // Create subscription (365 days from now)
+        // Check for an existing active subscription for this plan to support renewal
         const startsAt = new Date()
-        const endsAt = new Date()
-        endsAt.setDate(endsAt.getDate() + 365)
+        const existingSub = await prisma.subscription.findFirst({
+            where: {
+                userId: session.user.id,
+                isActive: true,
+                endsAt: { gt: startsAt },
+                planType: payment.planType,
+                class: payment.class,
+                subjectId: payment.subjectId
+            },
+            orderBy: { endsAt: "desc" }
+        })
+
+        // 1 full year from date of purchase (or +1 year from existing expiry date if renewing early)
+        const baseDate = existingSub && existingSub.endsAt > startsAt ? new Date(existingSub.endsAt) : new Date(startsAt)
+        const endsAt = new Date(baseDate)
+        endsAt.setFullYear(endsAt.getFullYear() + 1)
 
         const subscription = await prisma.subscription.create({
             data: {
@@ -90,6 +104,7 @@ export async function POST(request: NextRequest) {
                 subscription: {
                     id: subscription.id,
                     planName: subscription.planName,
+                    startsAt: subscription.startsAt,
                     endsAt: subscription.endsAt
                 }
             }

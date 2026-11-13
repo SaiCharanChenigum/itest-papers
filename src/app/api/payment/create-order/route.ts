@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
 import { createRazorpayOrder, SUBSCRIPTION_PLANS } from "@/lib/razorpay"
+import { getPricingRates } from "@/lib/pricing"
 
 /**
  * POST /api/payment/create-order  
@@ -31,9 +32,13 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Fetch dynamic rate from database (with fallback to plan default)
+        const rates = await getPricingRates()
+        const amount = rates[planKey as keyof typeof rates] ?? plan.amount
+
         // Create Razorpay order
         const razorpayOrder = await createRazorpayOrder(
-            plan.amount,
+            amount,
             plan.name,
             session.user.id
         )
@@ -43,7 +48,7 @@ export async function POST(request: NextRequest) {
             data: {
                 userId: session.user.id,
                 razorpayOrderId: razorpayOrder.id,
-                amount: plan.amount,
+                amount: amount,
                 currency: "INR",
                 status: "PENDING",
                 planName: plan.name,

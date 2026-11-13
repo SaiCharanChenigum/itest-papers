@@ -1,11 +1,16 @@
 import HeroSection from "@/components/HeroSection";
 import TrustSection from "@/components/TrustSection";
+import CustomHomeBanner from "@/components/CustomHomeBanner";
 import SubjectsGrid from "@/components/SubjectsGrid";
 import HowItWorks from "@/components/HowItWorks";
 import SamplePreview from "@/components/SamplePreview";
 import ProfessorSection from "@/components/ProfessorSection";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { getHeroImageUrl } from "@/lib/hero";
+import { getHomepageBanner } from "@/lib/banner";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await auth();
@@ -22,6 +27,12 @@ export default async function Home() {
     hasSubscription = !!sub;
   }
 
+  // Fetch dynamic hero image from Cloudinary / DB
+  const heroImage = await getHeroImageUrl();
+
+  // Fetch dynamic custom banner for homepage (placed above Choose Your Subject)
+  const banner = await getHomepageBanner();
+
   let previews: any[] = [];
   try {
     previews = await prisma.$queryRawUnsafe<any[]>(
@@ -33,8 +44,10 @@ export default async function Home() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection heroImageUrl={heroImage.imageUrl} />
       <TrustSection />
+      {/* Dynamic rectangular banner placed above Choose Your Subject */}
+      <CustomHomeBanner banner={banner} />
       <SubjectsGrid />
       <HowItWorks />
       <SamplePreview hasSubscription={hasSubscription} previews={previews} />
